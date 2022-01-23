@@ -1,13 +1,9 @@
 package ru.netology.data;
 
-import com.github.javafaker.Faker;
 import lombok.Value;
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.ScalarHandler;
+import com.github.javafaker.Faker;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.Locale;
 
 public class DataHelper {
     private DataHelper() {
@@ -15,73 +11,125 @@ public class DataHelper {
 
     @Value
     public static class AuthInfo {
-        String login;
-        String password;
+        String cardNumber;
+        String month;
+        String year;
+        String cardOwner;
+        String cvc;
     }
 
-    // валидный пользователь
-    public static AuthInfo getValidAuthInfo() {
-        return new AuthInfo("vasya", "qwerty123"); // id 9abf2854-58df-4f11-9d63-8360ab526a85
-    }
+    public static class ValidData {
 
-    // невалидный пользователь
-    public static AuthInfo getInvalidAuthInfo() {
-        Faker faker = new Faker();
-        return new AuthInfo(faker.name().username(), faker.internet().password());
-    }
-
-    @Value
-    public static class VerificationCode {
-        String code;
-    }
-
-    // валидный сгенерированный код из СУБД
-    public static VerificationCode getValidVerificationCode(AuthInfo authInfo) {
-        QueryRunner runner = new QueryRunner();
-        // comment: выражение запроса для поиска последнего кода, можно использовать сортировку по полю created и оператор LIMIT
-        String authCode = "SELECT code FROM auth_codes ORDER BY created DESC LIMIT 1";
-
-        try (
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", "app", "pass"
-                );
-        ) {
-            authCode = runner.query(connection, authCode, new ScalarHandler<>());
-        } catch (SQLException throwables) {
-            throwables.printStackTrace(); // comment: можно хотя бы в консоль ошибку вывести
+        public static String getApprovedCard() { // одобренная карта
+            return "4444444444444441";
         }
 
-        return new VerificationCode(authCode);
+        public static String getDeclinedCard() { // не одобренная карта
+            return "4444444444444442";
+        }
+
+        public static String getRandom13NumberCard() { // 13-тизначный номер карты
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().digits(13));
+        }
+
+        public static String getRandomCard() { // рандомная карта
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().digits(16));
+        }
+
+        public static String getRandom19NumberCard() { // 19-тизначный номер карты
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().digits(19));
+
+        }
+
+        public static String getMonth() { // Месяц – от 01 до 12, не ранее текущего месяца текущего года
+            Faker faker = new Faker();
+            return String.format("%02d\n", (faker.number().numberBetween(1, 12)));
+        }
+
+        public static String getYear() { // Год – две последние цифры года, не ранее текущего года + 5 лет
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().numberBetween(22, 27));
+        }
+
+        public static String getCardOwner() { // Владелец – латинские символы
+            Faker faker = new Faker(new Locale("en-US"));
+            return faker.name().lastName();
+        }
+
+        public static String getCVC() { // CVC – трехзначное число от 000 до 999
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().digits(3));
+        }
     }
 
-    // невалидный код
-    public static VerificationCode getInvalidVerificationCode(AuthInfo authInfo) {
-        return new VerificationCode("12345");
+    public static AuthInfo getApprovedData() { // одобренная карта + валидные поля
+        return new AuthInfo(ValidData.getApprovedCard(), ValidData.getMonth(), ValidData.getYear(), ValidData.getCardOwner(), ValidData.getCVC());
     }
 
-    // очистка всех данных из таблиц
-    public static void dropTables() {
-        QueryRunner runner = new QueryRunner();
-        String Cards = "DELETE FROM cards;";
-        String CardTransactions = "DELETE FROM card_transactions;";
-        String AuthCodes = "DELETE FROM auth_codes;";
-        String Users = "DELETE FROM users;"; // comment: таблица users может быть очищена только в последнюю очередь
+    public static AuthInfo getDeclinedData() { // не одобренная карта + валидные поля
+        Faker faker = new Faker();
+        return new AuthInfo(ValidData.getDeclinedCard(), ValidData.getMonth(), ValidData.getYear(), ValidData.getCardOwner(), ValidData.getCVC());
+    }
 
-        try (
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", "app", "pass"
-                );
-        ) {
-            runner.update(connection, Cards);
-            runner.update(connection, CardTransactions);
-            runner.update(connection, AuthCodes);
-            runner.update(connection, Users); // comment: таблица users может быть очищена только в последнюю очередь
+    public static AuthInfo getRandomData() { // рандомная карта + валидные поля
+        return new AuthInfo(ValidData.getRandomCard(), ValidData.getMonth(), ValidData.getYear(), ValidData.getCardOwner(), ValidData.getCVC());
+    }
 
-        } catch (SQLException throwables) {
-            throwables.printStackTrace(); // comment: можно хотя бы в консоль ошибку вывести
+    public static class InValidData {
+
+        public static String getEmptyData() { // Тесты с одним незаполненным полем
+            return "";
+        }
+
+        public static String getSetOfLatinCharacters() { // Тесты с вводом латинских символов
+            return "setoflatincharacters";
+        }
+
+        public static String getSetOfCyrillicCharacters() { // Тесты с вводом кириллических символов
+            return "кириллическиесимволы";
+        }
+
+        public static String getSetOfRandomCharacters() { // Тесты с вводом рандомных символов
+            return "««==№%%**??№==»»";
+        }
+
+        public static String getCardOwnerOver() { // Тест на ввод 34х латинских символов
+            return "thirtyfourlatincharactersinastring";
+        }
+
+        public static String getOneNumber() { // Тест на ввод однозначного номера
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().digits(1));
+        }
+
+        public static String getTwoNumber() { // Тест на ввод двухзначного номера
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().digits(2));
+        }
+
+        public static String getMonth00() { // Несуществующий номер месяца 00
+            return "00";
+        }
+
+        public static String getMonth13() { // Несуществующий номер месяца 13
+            return "13";
+        }
+
+        public static String getLastYear() { // Прошедшие года
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().numberBetween(19, 21));
+        }
+
+        public static String getFutureYear() { // Будущие года
+            Faker faker = new Faker();
+            return String.valueOf(faker.number().numberBetween(23, 25));
+        }
+
+        public static String getYearOver() { // Номер года превышает +5 лет от текущего
+            return "28";
         }
     }
 }
-
-
-

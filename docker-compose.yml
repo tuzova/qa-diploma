@@ -7,7 +7,7 @@ services:
     volumes:
       - .data:/docker-entrypoint-initdb.d
     environment:
-      - MYSQL_USER=tuzova
-      - MYSQL_PASSWORD=admin
-      - MYSQL_DATABASE=traveler
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=pass
+      - MYSQL_DATABASE=app
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
