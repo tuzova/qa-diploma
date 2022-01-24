@@ -41,7 +41,6 @@ public class DataHelper {
         public static String getRandom19NumberCard() { // 19-тизначный номер карты
             Faker faker = new Faker();
             return String.valueOf(faker.number().digits(19));
-
         }
 
         public static String getMonth() { // Месяц – от 01 до 12, не ранее текущего месяца текущего года
