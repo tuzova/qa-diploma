@@ -15,7 +15,7 @@
   - User: `app`  
   - Password: `pass`  
   - Database: `app`  
-- нажать `Test Connection`  
+- нажать `Test Connection` и дождаться успешного подключения: Successful  
 - нажать `OK`
 3. Запустить gate-simulator:  
 - `docker run -p 9999:9999 -d app-gate-simulator`   
