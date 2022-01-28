@@ -64,6 +64,10 @@ public class PayPage {
         $(withText("Поле обязательно для заполнения")).parent().$(withText("Владелец")).shouldBe(visible);
     }
 
+    public void messageWrongDataCardOwnerEmpty() {
+        $(withText("Поле обязательно для заполнения")).parent().$(withText("Владелец")).shouldNotBe(visible);
+    }
+
     public void messageWrongDataCvc() {
         $(withText("Неверный формат")).parent().$(withText("CVC")).shouldBe(visible);
     }

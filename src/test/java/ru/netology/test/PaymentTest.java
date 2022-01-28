@@ -1,11 +1,11 @@
 package ru.netology.test;
 
-import com.codeborne.selenide.Configuration;
-import com.codeborne.selenide.logevents.SelenideLogger;
-import org.junit.jupiter.api.*;
 import ru.netology.data.DataHelper;
 import ru.netology.sql.TestSQL;
 import ru.netology.page.HomePage;
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import org.junit.jupiter.api.*;
 import io.qameta.allure.selenide.AllureSelenide;
 
 import static com.codeborne.selenide.Selenide.open;
@@ -34,11 +34,9 @@ class PaymentTest {
         TestSQL.dropTables();
     }
 
-    // Позитивные сценарии тестирования
-
     @Test
-    @DisplayName("ID 01")
-    void shouldSuccessPayApprovedCard() { // Валидные данные, успешная операция
+    @DisplayName("ID 01 | Valid | Card APPROVED")
+    void shouldSuccessPayApprovedCard() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -52,8 +50,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 02-testCount")
-    void shouldDeniedPayDeclinedCardTestCount() { // Валидные данные, операция отклонена
+    @DisplayName("ID 02-C | Valid | Card DECLINED")
+    void shouldDeniedPayDeclinedCardTestCount() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -65,20 +63,20 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 02-message")
-    void shouldDeniedPayDeclinedCardTestMessage() { // Валидные данные, операция отклонена
+    @DisplayName("ID 02-M | Valid | Card DECLINED")
+    void shouldDeniedPayDeclinedCardTestMessage() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
         var authInfo = DataHelper.getDeclinedData(); // обратиться к валидным данным
         payPage.payment(authInfo.getCardNumber(), authInfo.getMonth(), authInfo.getYear(), authInfo.getCardOwner(), authInfo.getCvc()); // вставить данные
         payPage.messageDeniedPay(); // получить сообщение об отклонении операции
-        // FAILED получено сообщение об успешной операции -> БАГ -> Issue 02
+        // FAILED получено сообщение об успешной операции -> Issue 02
     }
 
     @Test
-    @DisplayName("ID 03-testCount")
-    void shouldSuccessPayRandomCardTestCount() { // В поле Номер карты ввести 16-тизначный номер, успешная операция
+    @DisplayName("ID 03-C | Valid | Card 16 num")
+    void shouldSuccessPayRandomCardTestCount() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -86,74 +84,82 @@ class PaymentTest {
         payPage.payment(authInfo.getCardNumber(), authInfo.getMonth(), authInfo.getYear(), authInfo.getCardOwner(), authInfo.getCvc()); // вставить данные
         var testCount = TestSQL.getCountPayments(); // проверить: данные внесены в БД
         assertEquals(1, testCount);
-        // FAILED данные не внесены в БД -> БАГ -> Issue 03
+        // FAILED данные не внесены в БД -> Issue 03
     }
 
     @Test
-    @DisplayName("ID 03-message")
-    void shouldSuccessPayRandomCardTestMessage() { // В поле Номер карты ввести 16-тизначный номер, успешная операция
+    @DisplayName("ID 03-M | Valid | Card 16 num")
+    void shouldSuccessPayRandomCardTestMessage() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
         var authInfo = DataHelper.getRandomData(); // обратиться к валидным данным
         payPage.payment(authInfo.getCardNumber(), authInfo.getMonth(), authInfo.getYear(), authInfo.getCardOwner(), authInfo.getCvc()); // вставить данные
         payPage.messageDeniedPay(); // получить сообщение об успешной операции
-        // FAILED получено два сообщения одновременно - об отклонении и об успешной операции -> БАГ -> Issue 04
+        // FAILED получено два сообщения одновременно - об отклонении и об успешной операции -> Issue 04
     }
 
     @Test
-    @DisplayName("ID 04-testCount")
-    void shouldSuccessPayRandom13CardTestCount() { // В поле Номер карты ввести 13-тизначный номер, успешная операция
+    @DisplayName("ID 04-C | Valid | Card 13 num")
+    void shouldSuccessPayRandom13CardTestCount() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
         payPage.payment(DataHelper.ValidData.getRandom13NumberCard(), DataHelper.ValidData.getMonth(), DataHelper.ValidData.getYear(), DataHelper.ValidData.getCardOwner(), DataHelper.ValidData.getCVC()); // вставить данные
         var testCount = TestSQL.getCountPayments(); // проверить: данные внесены в БД
         assertEquals(1, testCount);
-        // FAILED данные не внесены в БД -> БАГ -> Issue 05
+        // FAILED данные не внесены в БД -> Issue 05
     }
 
     @Test
-    @DisplayName("ID 04-message")
-    void shouldSuccessPayRandom13CardTestMessage() { // В поле Номер карты ввести 13-тизначный номер, успешная операция
+    @DisplayName("ID 04-M | Valid | Card 13 num")
+    void shouldSuccessPayRandom13CardTestMessage() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
         payPage.payment(DataHelper.ValidData.getRandom13NumberCard(), DataHelper.ValidData.getMonth(), DataHelper.ValidData.getYear(), DataHelper.ValidData.getCardOwner(), DataHelper.ValidData.getCVC()); // вставить данные
         payPage.messageDeniedPay(); // получить сообщение об успешной операции
-        // FAILED получено сообщение о неверном формате -> БАГ -> Issue 06
+        // FAILED получено сообщение о неверном формате -> Issue 06
     }
 
     @Test
-    @DisplayName("ID 05")
-    void shouldSuccessPayRandom19CardTestCount() { // В поле Номер карты ввести 19-тизначный номер, успешная операция
+    @DisplayName("ID 05 | Valid | Card 19 num")
+    void shouldSuccessPayRandom19CardTestCount() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
         payPage.payment(DataHelper.ValidData.getRandom19NumberCard(), DataHelper.ValidData.getMonth(), DataHelper.ValidData.getYear(), DataHelper.ValidData.getCardOwner(), DataHelper.ValidData.getCVC()); // вставить данные
         var testCount = TestSQL.getCountPayments(); // проверить: данные внесены в БД
         assertEquals(1, testCount);
-        // PASSED but FAILED -> поле ограничено 16 символами -> БАГ -> Issue 07
+        // PASSED but FAILED -> поле ограничено 16 символами -> Issue 07
     }
 
     @Test
-    @DisplayName("ID 06")
-    void shouldSuccessPayFutureYearNotOver() { // Номер года будущий, но не превышающий +5 лет, успешная операция
+    @DisplayName("ID 06-C | Valid | Future Year Not Over")
+    void shouldSuccessPayFutureYearNotOverTestCount() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
         payPage.payment(DataHelper.ValidData.getRandomCard(), DataHelper.ValidData.getMonth(), DataHelper.InValidData.getFutureYear(), DataHelper.ValidData.getCardOwner(), DataHelper.ValidData.getCVC()); // вставить данные
         var testCount = TestSQL.getCountPayments(); // проверить: данные внесены в БД
         assertEquals(1, testCount);
-        // FAILED данные не внесены в БД -> БАГ -> Issue 08
+        // FAILED данные не внесены в БД -> Issue 08
     }
 
+    @Test
+    @DisplayName("ID 06-M | Valid | Future Year Not Over")
+    void shouldSuccessPayFutureYearNotOverTestMessage() {
 
-    // Негативные сценарии тестирования
+        var homePage = new HomePage(); // открыть homePage
+        var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
+        payPage.payment(DataHelper.ValidData.getRandomCard(), DataHelper.ValidData.getMonth(), DataHelper.InValidData.getFutureYear(), DataHelper.ValidData.getCardOwner(), DataHelper.ValidData.getCVC()); // вставить данные
+        payPage.messageDeniedPay(); // получить сообщение об успешной операции
+        // FAILED получено два сообщения одновременно - об отклонении и об успешной операции -> Issue 15
+    }
 
     @Test
-    @DisplayName("ID 07")
-    void shouldDeniedPayEmptyCardNumber() { // Незаполненное поле, операция отклонена
+    @DisplayName("ID 07 | Invalid | Empty Card Number")
+    void shouldDeniedPayEmptyCardNumber() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -164,8 +170,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 08")
-    void shouldDeniedPayEmptyMonth() { // Незаполненное поле, операция отклонена
+    @DisplayName("ID 08 | Invalid | Empty Month")
+    void shouldDeniedPayEmptyMonth() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -176,8 +182,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 09")
-    void shouldDeniedPayEmptyYear() { // Незаполненное поле, операция отклонена
+    @DisplayName("ID 09 | Invalid | Empty Year")
+    void shouldDeniedPayEmptyYear() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -188,8 +194,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 10")
-    void shouldDeniedPayEmptyCardOwner() { // Незаполненное поле, операция отклонена
+    @DisplayName("ID 10 | Invalid | Empty CardOwner")
+    void shouldDeniedPayEmptyCardOwner() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -200,8 +206,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 11")
-    void shouldDeniedPayEmptyCvc() { // Незаполненное поле, операция отклонена
+    @DisplayName("ID 11 | Invalid | Empty CVC")
+    void shouldDeniedPayEmptyCvc() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -209,12 +215,13 @@ class PaymentTest {
         var testCount = TestSQL.getCountPayments(); // проверить: данные не внесены в БД
         assertEquals(0, testCount);
         payPage.messageWrongDataCvc(); // получить сообщение о неверном формате
-        // PASSED but FAILED получено два сообщения одновременно - в поле Владелец и поле CVC -> БАГ -> Issue 09
+        payPage.messageWrongDataCardOwnerEmpty(); // нет сообщения о неверном формате
+        // PASSED but FAILED получено два сообщения одновременно - в поле Владелец и поле CVC -> Issue 09
     }
 
     @Test
-    @DisplayName("ID 12")
-    void shouldDeniedPayLatinCardNumber() { // Ввод латинских символов, операция отклонена
+    @DisplayName("ID 12 | Invalid | Latin CardNumber")
+    void shouldDeniedPayLatinCardNumber() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -225,8 +232,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 13")
-    void shouldDeniedPayLatinMonth() { // Ввод латинских символов, операция отклонена
+    @DisplayName("ID 13 | Invalid | Latin Month")
+    void shouldDeniedPayLatinMonth() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -237,8 +244,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 14")
-    void shouldDeniedPayLatinYear() { // Ввод латинских символов, операция отклонена
+    @DisplayName("ID 14 | Invalid | Latin Year")
+    void shouldDeniedPayLatinYear() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -249,8 +256,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 15")
-    void shouldDeniedPayLatinCvc() { // Ввод латинских символов, операция отклонена
+    @DisplayName("ID 15 | Invalid | Latin CVC")
+    void shouldDeniedPayLatinCvc() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -258,12 +265,13 @@ class PaymentTest {
         var testCount = TestSQL.getCountPayments(); // проверить: данные не внесены в БД
         assertEquals(0, testCount);
         payPage.messageWrongDataCvc(); // получить сообщение о неверном формате
+        payPage.messageWrongDataCardOwnerEmpty(); // нет сообщения о неверном формате
         // PASSED but FAILED получено два сообщения одновременно - в поле Владелец и поле CVC -> БАГ -> Issue 09
     }
 
     @Test
-    @DisplayName("ID 16")
-    void shouldDeniedPayCyrillicCardNumber() { // Ввод кириллических символов, операция отклонена
+    @DisplayName("ID 16 | Invalid | Cyrillic CardNumber")
+    void shouldDeniedPayCyrillicCardNumber() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -274,8 +282,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 17")
-    void shouldDeniedPayCyrillicMonth() { // Ввод кириллических символов, операция отклонена
+    @DisplayName("ID 17 | Invalid | Cyrillic Month")
+    void shouldDeniedPayCyrillicMonth() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -286,8 +294,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 18")
-    void shouldDeniedPayCyrillicYear() { // Ввод кириллических символов, операция отклонена
+    @DisplayName("ID 18 | Invalid | Cyrillic Year")
+    void shouldDeniedPayCyrillicYear() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -298,8 +306,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 19")
-    void shouldDeniedPayCyrillicCardOwner() { // Ввод кириллических символов, операция отклонена
+    @DisplayName("ID 19 | Invalid | Cyrillic CardOwner")
+    void shouldDeniedPayCyrillicCardOwner() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -311,8 +319,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 20")
-    void shouldDeniedPayCyrillicCvc() { // Ввод кириллических символов, операция отклонена
+    @DisplayName("ID 20 | Invalid | Cyrillic CVC")
+    void shouldDeniedPayCyrillicCvc() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -320,12 +328,13 @@ class PaymentTest {
         var testCount = TestSQL.getCountPayments(); // проверить: данные не внесены в БД
         assertEquals(0, testCount);
         payPage.messageWrongDataCvc(); // получить сообщение о неверном формате
+        payPage.messageWrongDataCardOwnerEmpty(); // нет сообщения о неверном формате
         // PASSED but FAILED получено два сообщения одновременно - в поле Владелец и поле CVC -> БАГ -> Issue 09
     }
 
     @Test
-    @DisplayName("ID 21")
-    void shouldDeniedPayRandomCharsCardNumber() { // Ввод произвольных символов, операция отклонена
+    @DisplayName("ID 21 | Invalid | Random Chars CardNumber")
+    void shouldDeniedPayRandomCharsCardNumber() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -336,8 +345,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 22")
-    void shouldDeniedPayRandomCharsMonth() { // Ввод произвольных символов, операция отклонена
+    @DisplayName("ID 22 | Invalid | Random Chars Month")
+    void shouldDeniedPayRandomCharsMonth() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -348,8 +357,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 23")
-    void shouldDeniedPayRandomCharsYear() { // Ввод произвольных символов, операция отклонена
+    @DisplayName("ID 23 | Invalid | Random Chars Year")
+    void shouldDeniedPayRandomCharsYear() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -360,8 +369,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 24")
-    void shouldDeniedPayRandomCharsCardOwner() { // Ввод произвольных символов, операция отклонена
+    @DisplayName("ID 24 | Invalid | Random Chars CardOwner")
+    void shouldDeniedPayRandomCharsCardOwner() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -373,8 +382,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 25")
-    void shouldDeniedPayRandomCharsCvc() { // Ввод произвольных символов, операция отклонена
+    @DisplayName("ID 25 | Invalid | Random Chars CVC")
+    void shouldDeniedPayRandomCharsCvc() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -382,12 +391,13 @@ class PaymentTest {
         var testCount = TestSQL.getCountPayments(); // проверить: данные не внесены в БД
         assertEquals(0, testCount);
         payPage.messageWrongDataCvc(); // получить сообщение о неверном формате
+        payPage.messageWrongDataCardOwnerEmpty(); // нет сообщения о неверном формате
         // PASSED but FAILED получено два сообщения одновременно - в поле Владелец и поле CVC -> БАГ -> Issue 09
     }
 
     @Test
-    @DisplayName("ID 26")
-    void shouldDeniedPayOneNumMonth() { // Месяц ввести однозначный номер, операция отклонена
+    @DisplayName("ID 26 | Invalid | One Num Month")
+    void shouldDeniedPayOneNumMonth() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -398,8 +408,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 27")
-    void shouldDeniedPay00Month() { // Месяц ввести несуществующий номер, операция отклонена
+    @DisplayName("ID 27 | Invalid | Month 00")
+    void shouldDeniedPay00Month() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -411,8 +421,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 28")
-    void shouldDeniedPay13Month() { // Месяц ввести несуществующий номер, операция отклонена
+    @DisplayName("ID 28 | Invalid | Month 13")
+    void shouldDeniedPay13Month() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -423,8 +433,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 29")
-    void shouldDeniedPayWrongYear() { // Номер года превышает +5 лет от текущего, операция отклонена
+    @DisplayName("ID 29 | Invalid | Year Over")
+    void shouldDeniedPayYearOver() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -435,8 +445,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 30")
-    void shouldDeniedPayLastYear() { // Номер года прошедший, операция отклонена
+    @DisplayName("ID 30 | Invalid | Last Year")
+    void shouldDeniedPayLastYear() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -447,8 +457,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 31")
-    void shouldDeniedPayCardOwnerOver() { // Проверка поля Владелец на ограничение символов, операция отклонена
+    @DisplayName("ID 31 | Invalid | CardOwner Over")
+    void shouldDeniedPayCardOwnerOver() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -460,8 +470,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 32")
-    void shouldDeniedPayOneNumCvc() { // CVC ввести однозначный номер, операция отклонена
+    @DisplayName("ID 32 | Invalid | One Num CVC")
+    void shouldDeniedPayOneNumCvc() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage
@@ -472,8 +482,8 @@ class PaymentTest {
     }
 
     @Test
-    @DisplayName("ID 33")
-    void shouldDeniedPayTwoNumCvc() { // CVC ввести двухзначный номер, операция отклонена
+    @DisplayName("ID 33 | Invalid | Two Num CVC")
+    void shouldDeniedPayTwoNumCvc() {
 
         var homePage = new HomePage(); // открыть homePage
         var payPage = homePage.buyButton(); // нажать на кнопку Купить -> переход на PayPage

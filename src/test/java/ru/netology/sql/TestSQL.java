@@ -1,6 +1,5 @@
 package ru.netology.sql;
 
-import lombok.Value;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 
@@ -9,14 +8,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class TestSQL {
-    private TestSQL() {
-    }
 
-    @Value
-    public static class TestStatus {
-        String status;
-        long count;
-    }
+    static String url = "jdbc:mysql://localhost:3306/app";
+    static String user = "app";
+    static String password = "pass";
 
     public static String getStatus() {
 
@@ -25,9 +20,7 @@ public class TestSQL {
         String statusActual = null;
 
         try (
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", "app", "pass"
-                );
+                Connection connection = DriverManager.getConnection(url, user, password);
         ) {
             statusActual = runner.query(connection, status, new ScalarHandler<>());
 
@@ -44,9 +37,7 @@ public class TestSQL {
         long countActual = 0;
 
         try (
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", "app", "pass"
-                );
+                Connection connection = DriverManager.getConnection(url, user, password);
         ) {
             countActual = runner.query(connection, count, new ScalarHandler<>());
 
@@ -63,9 +54,7 @@ public class TestSQL {
         String statusActual = null;
 
         try (
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", "app", "pass"
-                );
+                Connection connection = DriverManager.getConnection(url, user, password);
         ) {
             statusActual = runner.query(connection, status, new ScalarHandler<>());
 
@@ -82,9 +71,7 @@ public class TestSQL {
         long countActual = 0;
 
         try (
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", "app", "pass"
-                );
+                Connection connection = DriverManager.getConnection(url, user, password);
         ) {
             countActual = runner.query(connection, count, new ScalarHandler<>());
 
@@ -102,9 +89,7 @@ public class TestSQL {
         String OrderEntity = "DELETE FROM order_entity;";
 
         try (
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/app", "app", "pass"
-                );
+                Connection connection = DriverManager.getConnection(url, user, password);
         ) {
             runner.update(connection, CreditRequestEntity);
             runner.update(connection, OrderEntity);
